@@ -53,63 +53,59 @@ class MyShoppingList extends Component {
           ...doc.data()
         }));
 
-      // set the shoppinglist to the state
-      this.setState({
-        // default color
-        // Incomplete: yellow
-        // complete: green
-        shoppinglist: shoppinglist.map((item, index) => {
-          let color = "yellow";
-          let cardBackground = { background: "white" };
-          let shopComplete = { textDecoration: "none" };
+        this.setState({
+          shoppinglist: shoppinglist.map((item, index) => {
+            let color = "yellow";
+            let cardBackground = { background: "white" };
+            let shopComplete = { textDecoration: "none" };
 
-          if (item.status) {
-            color = "green";
-            cardBackground.background = "beige";
-            shopComplete["textDecoration"] = "line-through";
-          }
-          return (
-            <Card key={item.id} color={color} fluid style={cardBackground}>
-              <Card.Content>
-                <Card.Header textAlign="left" style={shopComplete}>
-                  <div style={{ wordWrap: "break-word" }}>{item.item}</div>
-                </Card.Header>
+            if (item.status) {
+              color = "green";
+              cardBackground.background = "beige";
+              shopComplete["textDecoration"] = "line-through";
+            }
+            return (
+              <Card key={item.id} color={color} fluid style={cardBackground}>
+                <Card.Content>
+                  <Card.Header textAlign="left" style={shopComplete}>
+                    <div style={{ wordWrap: "break-word" }}>{item.item}</div>
+                  </Card.Header>
 
-                <Card.Meta textAlign="right">
-                  <Icon
-                    link
-                    name="check circle"
-                    color="green"
-                    onClick={() => this.updateItem(item.id)}
-                  />
-                  <span style={{ paddingRight: 10 }}>Done</span>
-                  <Icon
-                    link
-                    name="undo"
-                    color="yellow"
-                    onClick={() => this.undoItem(item.id)}
-                  />
-                  <span style={{ paddingRight: 10 }}>Undo</span>
-                  <Icon
-                    link
-                    name="delete"
-                    color="red"
-                    onClick={() => this.deleteItem(item.id)}
-                  />
-                  <span style={{ paddingRight: 10 }}>Delete</span>
-                </Card.Meta>
-              </Card.Content>
-            </Card>
-          );
-        })
+                  <Card.Meta textAlign="right">
+                    <Icon
+                      link
+                      name="check circle"
+                      color="green"
+                      onClick={() => this.updateItem(item.id)}
+                    />
+                    <span style={{ paddingRight: 10 }}>Done</span>
+                    <Icon
+                      link
+                      name="undo"
+                      color="yellow"
+                      onClick={() => this.undoItem(item.id)}
+                    />
+                    <span style={{ paddingRight: 10 }}>Undo</span>
+                    <Icon
+                      link
+                      name="delete"
+                      color="red"
+                      onClick={() => this.deleteItem(item.id)}
+                    />
+                    <span style={{ paddingRight: 10 }}>Delete</span>
+                  </Card.Meta>
+                </Card.Content>
+              </Card>
+            );
+          })
+        });
       });
-    });
   };
 
   // update the item status to true
   updateItem = (id) => {
     db.collection("shoppinglist").doc(id).update({ status: true });
-};
+  };
 
   // undo the item status from true to false
   undoItem = (id) => {
@@ -149,4 +145,4 @@ class MyShoppingList extends Component {
   }
 }
 
-export default MyShoppingList;      
+export default MyShoppingList;
