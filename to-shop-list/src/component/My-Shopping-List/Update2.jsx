@@ -1,11 +1,7 @@
-// import React, { useEffect, useState,Component } from "react";
-// import { Card, Header, Form, Input, Icon } from "semantic-ui-react";
-// import db from "./firebase"; // Import Firestore instance
-// import "./my-shopping-list.css";
-// import { getDatabase, ref, onValue } from "firebase/database";
 import React, { Component } from "react";
 import { Card, Header, Form, Input, Icon } from "semantic-ui-react";
 import { db } from "./firebase"; // Import the configured Firestore instance
+console.log(db); 
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import "./my-shopping-list.css";
 
@@ -52,24 +48,8 @@ class MyShoppingList extends Component {
       const querySnapshot = await getDocs(collection(db, "shoppinglist"));
       const shoppinglist = [];
       querySnapshot.forEach((doc) => {
-        let item = doc.data();
-      item.id = doc.id;
-
-      // Default styles for incomplete items
-      let color = "yellow";
-      let cardBackground = { background: "white" };
-      let shopComplete = { textDecoration: "none" };
-
-      // Update styles if the item is marked as completed
-      if (item.status) {
-        color = "green";
-        cardBackground.background = "beige";
-        shopComplete["textDecoration"] = "line-through";
-      }
-
-      // Add styles to the item object
-      shoppinglist.push({ ...item, color, cardBackground, shopComplete });
-    });
+        shoppinglist.push({ ...doc.data(), id: doc.id });
+      });
       this.setState({ shoppinglist, loading: false });
     } catch (error) {
       console.error("Error getting documents: ", error);
@@ -123,7 +103,7 @@ class MyShoppingList extends Component {
         <Header as="h1">
           <div className="app-header">📝 Ghaddar Household Shopping List</div>
         </Header>
-        <Form onSubmit={this.onSubmit} className="form-class">
+        <Form onSubmit={this.onSubmit}>
           <Input
             type="text"
             name="item"
@@ -133,12 +113,11 @@ class MyShoppingList extends Component {
             placeholder="item..."
           />
         </Form>
-
         <Card.Group>
           {shoppinglist.map((item) => (
-            <Card key={item.id} fluid color={item.color} style={item.cardBackground}>
+            <Card key={item.id} fluid>
               <Card.Content>
-                <Card.Header style={item.shopComplete}>{item.item}</Card.Header>
+                <Card.Header>{item.item}</Card.Header>
                 <Card.Meta textAlign="right">
                   <Icon
                     link
@@ -146,21 +125,18 @@ class MyShoppingList extends Component {
                     color="green"
                     onClick={() => this.updateItem(item.id)}
                   />
-                  <span style={{ paddingRight: 10 }}>Done</span>
                   <Icon
                     link
                     name="undo"
                     color="yellow"
                     onClick={() => this.undoItem(item.id)}
                   />
-                  <span style={{ paddingRight: 10 }}>Undo</span>
                   <Icon
                     link
                     name="delete"
                     color="red"
                     onClick={() => this.deleteItem(item.id)}
                   />
-                  <span style={{ paddingRight: 10 }}>Delete</span>
                 </Card.Meta>
               </Card.Content>
             </Card>

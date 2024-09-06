@@ -14,10 +14,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore
+// Initialize Firestore and export it
 const db = getFirestore(app);
 
+// Log to confirm initialization
+//console.log("Firebase initialized", app);
 export { db };
+
 
 // // Import the functions you need from the SDKs you need
 // import { initializeApp } from "firebase/app";

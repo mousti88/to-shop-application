@@ -6,3 +6,6 @@
   .app-form {
     margin-bottom: 20px;
   }
+  .form-class {
+    margin-bottom: 20px; /* Adjust this value to control the spacing */
+  }

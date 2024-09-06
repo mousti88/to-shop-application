@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import MyShoppingList from "./component/My-Shopping-List";
+//import Update2 from "./component/My-Shopping-List";
 
 function App() {
   return (
