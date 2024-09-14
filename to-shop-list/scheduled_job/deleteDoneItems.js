@@ -51,7 +51,17 @@ async function deleteDoneItems() {
 }
 
 // Run deleteDoneItems at start
-deleteDoneItems();
+//deleteDoneItems();
+
+// Route to handle deletion of done items
+app.get('/deleteDoneItems', async (req, res) => {
+  try {
+    await deleteDoneItems();
+    res.send('Done items deleted successfully.');
+  } catch (error) {
+    res.status(500).send('Error deleting done items.');
+  }
+});
 
 // Start express app on the specified port to keep the service alive
 app.get('/', (req, res) => res.send('Delete Done Items service is running.'));
