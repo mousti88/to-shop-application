@@ -1,16 +1,16 @@
-const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { initializeApp, applicationDefault } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const fs = require('fs');
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
-// Use environment variable to get the service account key JSON
-const serviceAccountKey = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+// Read service account key from environment variable
+const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || '/etc/secrets/GOOGLE_APPLICATION_CREDENTIALS';
+const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
 
-// Parse the service account key
-const serviceAccount = JSON.parse(serviceAccountKey);
-
-// Initialize Firebase
+// Initialize Firebase with the service account credentials
 initializeApp({
-  credential: cert(serviceAccount),
+  credential: applicationDefault(),
+  credential: serviceAccount
 });
 
 const db = getFirestore();
