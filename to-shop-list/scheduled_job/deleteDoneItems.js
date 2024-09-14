@@ -1,17 +1,19 @@
-const { initializeApp, cert } = require('firebase-admin/app');
+const { initializeApp, applicationDefault } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-//const serviceAccount = require('./serviceAccountKey.json'); // Adjust path as needed
-const admin = require('firebase-admin');
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
-// Load credentials from the environment variable
-const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+// Read service account key from environment variable
+const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || '/etc/secrets/serviceAccountKey.json';
+const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
 
-// Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+// Initialize Firebase with the service account credentials
+initializeApp({
+  credential: applicationDefault(),
+  credential: serviceAccount
 });
 
-const db = admin.firestore();
+const db = getFirestore();
 
 async function deleteDoneItems() {
   try {
