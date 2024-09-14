@@ -4,7 +4,7 @@ const { readFileSync } = require('fs');
 const { join } = require('path');
 
 // Read service account key from environment variable
-const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || 'GOOGLE_APPLICATION_CREDENTIALS';
+const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || '/etc/secrets/GOOGLE_APPLICATION_CREDENTIALS';
 const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
 
 // Initialize Firebase with the service account credentials
