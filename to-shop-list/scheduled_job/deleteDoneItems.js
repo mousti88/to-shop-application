@@ -1,14 +1,14 @@
-const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const fs = require('fs');
 
-// Use environment variable to get the service account key JSON
-const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+// Access credentials from environment variables
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),  // Replace escaped newlines
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+};
 
-// Parse the service account key
-const serviceAccount = JSON.parse(serviceAccountKey);
-
-// Initialize Firebase
+// Initialize Firebase with environment variables
 initializeApp({
   credential: cert(serviceAccount),
 });
