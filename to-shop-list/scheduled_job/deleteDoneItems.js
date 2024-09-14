@@ -3,9 +3,9 @@ const { getFirestore } = require('firebase-admin/firestore');
 
 // Access credentials from environment variables
 const serviceAccount = {
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY,//.replace(/\\n/g, '\n'),  // Replace escaped newlines
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  project_id: process.env.project_id,
+  private_key: process.env.private_key,//.replace(/\\n/g, '\n'),  // Replace escaped newlines
+  client_email: process.env.client_email,
 };
 
 // Initialize Firebase with environment variables
