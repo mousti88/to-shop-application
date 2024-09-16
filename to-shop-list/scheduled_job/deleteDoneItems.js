@@ -57,7 +57,8 @@ async function deleteDoneItems() {
 app.get('/deleteDoneItems', async (req, res) => {
   try {
     await deleteDoneItems();
-    res.send('Done items deleted successfully.');
+    //res.send('Done items deleted successfully.');
+    res.send('Ok');
   } catch (error) {
     res.status(500).send('Error deleting done items.');
   }
