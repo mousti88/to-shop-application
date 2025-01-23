@@ -146,7 +146,13 @@ class MyShoppingList extends Component {
       let color = "yellow";
       let cardBackground = { background: "white" };
       let shopComplete = { textDecoration: "none" };
-
+      
+      // Update styles if the item end with a "!"
+      if (item.item.endsWith("!") && item.status !== true) {
+        color = "purple";
+        cardBackground.background = "#fca09a";
+      }
+      
       // Update styles if the item is marked as completed
       if (item.status) {
         color = "green";
