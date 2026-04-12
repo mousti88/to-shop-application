@@ -17,9 +17,15 @@ class MyShoppingList extends Component {
       item: "",
       shoppinglist: [],
       loading: true,
-      error: null
+      error: null,
+      currentUser: "arwa" // "arwa" or "fatouma"
     };
   }
+
+  // Helper function to get the collection name based on current user
+  getCollectionName = () => {
+    return this.state.currentUser === "arwa" ? "shoppinglist" : "shoppinglist_fatouma";
+  };
 
   componentDidMount = () => {
     this.getShopList();
@@ -58,7 +64,8 @@ class MyShoppingList extends Component {
   // <<<< NEW: Function to delete all done items
   deleteDoneItems = async () => {
     try {
-      const doneItemsQuery = query(collection(db, "shoppinglist"), where("status", "==", true));
+      const collectionName = this.getCollectionName();
+      const doneItemsQuery = query(collection(db, collectionName), where("status", "==", true));
       const querySnapshot = await getDocs(doneItemsQuery);
 
       
@@ -97,10 +104,11 @@ class MyShoppingList extends Component {
   onSubmit = async () => {
     if (this.state.item) {
       try {
+        const collectionName = this.getCollectionName();
         const normalizedNewItem = this.normalizeItem(this.state.item);
 
         // Get all items from Firestore
-        const shoppinglistRef = collection(db, "shoppinglist");
+        const shoppinglistRef = collection(db, collectionName);
         const querySnapshot = await getDocs(shoppinglistRef);
 
         // Check if any of the existing items (normalized) match the new item
@@ -136,7 +144,8 @@ class MyShoppingList extends Component {
 
   getShopList = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "shoppinglist"));
+      const collectionName = this.getCollectionName();
+      const querySnapshot = await getDocs(collection(db, collectionName));
       const shoppinglist = [];
       querySnapshot.forEach((doc) => {
         let item = doc.data();
@@ -171,7 +180,7 @@ class MyShoppingList extends Component {
   };
 
   updateItem = async (id) => {
-    const docRef = doc(db, "shoppinglist", id);
+    const docRef = doc(db, this.getCollectionName(), id);
     try {
       await updateDoc(docRef, { status: true });
       this.getShopList();
@@ -181,7 +190,7 @@ class MyShoppingList extends Component {
   };
 
   undoItem = async (id) => {
-    const docRef = doc(db, "shoppinglist", id);
+    const docRef = doc(db, this.getCollectionName(), id);
     try {
       await updateDoc(docRef, { status: false });
       this.getShopList();
@@ -191,7 +200,7 @@ class MyShoppingList extends Component {
   };
 
   deleteItem = async (id) => {
-    const docRef = doc(db, "shoppinglist", id);
+    const docRef = doc(db, this.getCollectionName(), id);
     try {
       await deleteDoc(docRef);
       this.getShopList();
@@ -200,8 +209,14 @@ class MyShoppingList extends Component {
     }
   };
 
+  switchUser = (user) => {
+    this.setState({ currentUser: user, loading: true }, () => {
+      this.getShopList();
+    });
+  };
+
   render() {
-    const { shoppinglist, loading, error } = this.state;
+    const { shoppinglist, loading, error, currentUser } = this.state;
 
     if (loading) {
       return <div>Loading...</div>;
@@ -211,11 +226,31 @@ class MyShoppingList extends Component {
       return <div>{error}</div>;
     }
 
+    // Very light background colors - almost imperceptible difference
+    const backgroundColor = currentUser === "arwa" ? "#f0f8ff" : "#fff0f5"; // Alice blue vs lavender blush
+
     return (
-      <div>
+      <div style={{ backgroundColor, minHeight: "100vh", padding: "20px", transition: "background-color 0.3s ease" }}>
         <Header as="h1">
-          <div className="app-header">📝 Ghaddar Household Shopping List</div>
+          <div className="app-header">📝 Shopping List</div>
         </Header>
+
+        {/* User Toggle */}
+        <div className="user-toggle">
+          <button
+            className={`toggle-btn ${currentUser === "arwa" ? "active" : ""}`}
+            onClick={() => this.switchUser("arwa")}
+          >
+            Arwa
+          </button>
+          <button
+            className={`toggle-btn ${currentUser === "fatouma" ? "active" : ""}`}
+            onClick={() => this.switchUser("fatouma")}
+          >
+            Fatouma
+          </button>
+        </div>
+
         <Form onSubmit={this.onSubmit} className="form-class">
           <Input
             type="text"

@@ -28,23 +28,28 @@ const db = getFirestore();
 
 async function deleteDoneItems() {
   try {
-    const shoppingListRef = db.collection('shoppinglist');
-    const doneItemsQuery = shoppingListRef.where('status', '==', true);
-    const doneItemsSnapshot = await doneItemsQuery.get();
+    // Delete done items from both collections
+    const collections = ['shoppinglist', 'shoppinglist_fatouma'];
+    
+    for (const collectionName of collections) {
+      const shoppingListRef = db.collection(collectionName);
+      const doneItemsQuery = shoppingListRef.where('status', '==', true);
+      const doneItemsSnapshot = await doneItemsQuery.get();
 
-    if (doneItemsSnapshot.empty) {
-      console.log('No done items to delete');
-      return;
+      if (doneItemsSnapshot.empty) {
+        console.log(`No done items to delete in ${collectionName}`);
+        continue;
+      }
+
+      const batch = db.batch();
+
+      doneItemsSnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(`Done items successfully deleted from ${collectionName}`);
     }
-
-    const batch = db.batch();
-
-    doneItemsSnapshot.forEach((doc) => {
-      batch.delete(doc.ref);
-    });
-
-    await batch.commit();
-    console.log('Done items successfully deleted');
   } catch (error) {
     console.error('Error deleting done items:', error);
   }
