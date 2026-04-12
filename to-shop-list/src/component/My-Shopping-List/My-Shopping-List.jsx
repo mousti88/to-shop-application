@@ -5,9 +5,11 @@
 // import { getDatabase, ref, onValue } from "firebase/database";
 import React, { Component } from "react";
 import { Card, Header, Form, Input, Icon } from "semantic-ui-react"; //, Button
-import { db } from "./firebase"; // Import the configured Firestore instance
+import { db,app } from "./firebase"; // Import the configured Firestore instance
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch } from "firebase/firestore";
 import "./my-shopping-list.css";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+// import { app } from "./firebase"; // make sure firebase exports initialized `app`
 
 class MyShoppingList extends Component {
   constructor(props) {
@@ -24,6 +26,16 @@ class MyShoppingList extends Component {
   componentDidMount = () => {
     this.getShopList();
     this.scheduleDeleteDoneItems();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register(`${process.env.PUBLIC_URL}/firebase-messaging-sw.js`)
+        .then((registration) => console.log("Service Worker registered:", registration))
+        .catch((error) => console.error("SW registration failed:", error));
+    }
+    
+    // Don’t call automatically — wait for user to click the button
+    this.initNotifications();
   };
 
   scheduleDeleteDoneItems = () => {
@@ -54,6 +66,57 @@ class MyShoppingList extends Component {
     //}, msUntilMidnight);
     }, msUntilTarget);
   };
+
+  initNotifications = async () => {
+  try {
+    // Feature detection
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      console.warn("🚫 This browser does not support Firebase Messaging.");
+      return; // Exit early
+    }
+
+    const messaging = getMessaging(app);
+
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      const token = await getToken(messaging, {
+        vapidKey: "BEWR2dOQqXu6bfIHJm9Bw32Z8ysLVSzGkNC5tWP0qe7wpGifbr7yULuQl4VvpQeLkSIiEHuV233iFuCLOwuTX6I", // replace with your VAPID key
+        serviceWorkerRegistration: await navigator.serviceWorker.register(
+          `${process.env.PUBLIC_URL}/firebase-messaging-sw.js`
+        ),
+        
+      });
+
+      if (token) {
+        console.log("✅ Notification token:", token);
+        // Optional: send token to backend
+        // await fetch("/save-token", { method: "POST", body: JSON.stringify({ token }) });
+        await fetch("http://localhost:3001/api/save-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+  });
+      } else {
+        console.warn("⚠️ No token received. Push notifications won't work.");
+      }
+    } else {
+      console.log("❌ Notification permission denied");
+      return;
+    }
+
+    // Listen for messages while app is open
+    onMessage(messaging, (payload) => {
+      console.log("📩 Message received:", payload);
+      if (payload.notification) {
+        alert(`${payload.notification.title}: ${payload.notification.body}`);
+      }
+    });
+
+  } catch (err) {
+    console.error("Error setting up notifications:", err);
+  }
+};
+
 
   // <<<< NEW: Function to delete all done items
   deleteDoneItems = async () => {
@@ -127,6 +190,14 @@ class MyShoppingList extends Component {
         console.log("Document written with ID: ", docRef.id);
         this.setState({ item: "" });
         this.getShopList();
+        await fetch("http://localhost:3001/api/send-notification", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: "New Shopping Item",
+            body: `Someone added: ${this.state.item}`,
+          }),
+        });
       } catch (error) {
         console.error("Error adding document: ", error);
       }
@@ -259,6 +330,21 @@ class MyShoppingList extends Component {
             </Card>
           ))}
         </Card.Group>
+        {/* <button
+          onClick={this.initNotifications}
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          🔔 Enable Notifications
+        </button> */}
+
       </div>
     );
   }

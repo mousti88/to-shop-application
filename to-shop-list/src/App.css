@@ -2,3 +2,12 @@ body {
   width: 90%;
   margin-left: 20px;
 }
+  /* html, body {
+  overscroll-behavior-y: contain; 
+  height: 100%;
+}
+
+.react-pull-to-refresh {
+  -webkit-overflow-scrolling: touch; 
+} */
+ 
