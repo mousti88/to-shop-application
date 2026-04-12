@@ -34,7 +34,6 @@ class MyShoppingList extends Component {
 
   scheduleDeleteDoneItems = () => {
   const now = new Date();
-  const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
       //Set target time to 12:27 PM
   const targetTime = new Date();
   targetTime.setHours(13, 55, 0, 0); // 12:22:00 PM
